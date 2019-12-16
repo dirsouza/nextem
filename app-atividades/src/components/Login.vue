@@ -43,8 +43,8 @@ export default {
   name: "login",
   data() {
     return {
-      email: "test@nextem.com.br",
-      password: "1234"
+      email: "",
+      password: ""
     };
   },
   methods: {
@@ -66,5 +66,3 @@ export default {
   }
 };
 </script>
-
-<style scoped></style>

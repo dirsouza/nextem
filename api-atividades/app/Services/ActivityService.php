@@ -153,4 +153,40 @@ class ActivityService
             ];
         }
     }
+
+    public static function deleteActivity(int $id): array
+    {
+        DB::beginTransaction();
+        try {
+            $activity = Activity::find($id);
+
+            if (!$activity->exists()) {
+                throw new \Exception("Tarefa não encontrada.", 404);
+            }
+
+            $activity->users()->detach();
+
+            $result = $activity->delete();
+
+            if (!$result) {
+                throw new \Exception("Não foi possível realizar a exclusão da tarefa.", 500);
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'message' => "Tarefa excluída com sucesso!",
+                'code' => 201
+            ];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+            ];
+        }
+    }
 }

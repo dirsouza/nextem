@@ -178,7 +178,7 @@ export default {
       this.$emit("dialog:close", false);
     },
     async save() {
-      if (this.itemEdit === null) {
+      if (this.itemEdit === null || Object.keys(this.itemEdit).length <= 0) {
         await this.create();
       } else {
         await this.update(this.itemEdit.id);

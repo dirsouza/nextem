@@ -67,4 +67,13 @@ class ActivityController extends Controller
             ->json(Arr::except($response, 'code'))
             ->setStatusCode($response['code']);
     }
+
+    public function delete(int $id)
+    {
+        $response = $this->activityService->deleteActivity($id);
+
+        return response()
+            ->json(Arr::except($response, 'code'))
+            ->setStatusCode($response['code']);
+    }
 }

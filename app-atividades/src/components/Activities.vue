@@ -93,6 +93,7 @@ export default {
   methods: {
     async getActivities() {
       try {
+        this.listActivities = [];
         this.listActivities = await this.$axios.post("activity/activities")
           .then(res => res.data.data);
       } catch (e) {
@@ -113,6 +114,25 @@ export default {
     editItem(activity) {
       this.itemEdit = activity;
       this.dialog = true;
+    },
+    async deleteItem(id) {
+      try {
+        await this.$axios.post(`activity/${id}/delete`);
+        this.getActivities();
+      } catch (e) {
+        const res = e.response;
+
+        if (res.status === 401 && res.data.message === "Token expirado!") {
+          this.snackbar = {
+            show: true,
+            message: res.data.message || "Não autorizado",
+            type: 'error'
+          };
+
+          this.$store.dispatch("auth/logout");
+          this.$router.push("/login");
+        }
+      }
     },
     close(event) {
       this.getActivities();

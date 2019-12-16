@@ -15,6 +15,7 @@ Route::middleware('api')->group(function () {
             Route::post('status', 'ActivityController@status');
             Route::post('create', 'ActivityController@create');
             Route::post('{id}/update', 'ActivityController@update');
+            Route::post('{id}/delete', 'ActivityController@delete');
         });
     });
 });
