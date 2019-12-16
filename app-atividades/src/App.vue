@@ -11,6 +11,7 @@ export default {
     this.$axios.interceptors.response.use(undefined, err => {
       if (err.status === 401) {
         this.$store.dispach("auth/logout");
+        this.$router.push("/");
       }
 
       throw err;

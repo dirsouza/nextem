@@ -23,7 +23,7 @@ class TokenValidate
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => "Não autorizado",
+                'message' => "Token expirado!",
             ], 401);
         }
     }

@@ -1,9 +1,14 @@
 <template>
-  <v-dialog v-model="dialog" max-width="500px">
-    <template v-slot:activator="{ on }">
-      <v-btn color="primary" dark class="mb-2" v-on="on">Nova Tarefa</v-btn>
-    </template>
-    <Form />
+  <v-dialog
+    v-model="showDialog"
+    persistent
+    max-width="500px"
+  >
+    <Form
+      :title="title"
+      :item-edit="itemEdit"
+      @dialog:close="close"
+    />
   </v-dialog>
 </template>
 
@@ -19,6 +24,33 @@ export default {
     dialog: {
       type: Boolean,
       default: false
+    },
+    itemEdit: {
+      type: Object,
+      required: false
+    }
+  },
+  data() {
+    return {
+      showDialog: false,
+      title: "Nova Tarefa"
+    };
+  },
+  watch: {
+    dialog(val) {
+      this.showDialog = val;
+    },
+    itemEdit(item) {
+      if (item) {
+        this.title = "Editar Tarefa";
+      } else {
+        this.title = "Nova Tarefa";
+      }
+    }
+  },
+  methods: {
+    close(event) {
+      this.$emit("dialog:close", event);
     }
   }
 };

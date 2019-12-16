@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const { VUE_APP_API_HOST, VUE_APP_API_PORT } = process.env;
+
 const config = {
-  baseURL: "http://127.0.0.1:8000/api/",
+  baseURL: `http://${VUE_APP_API_HOST}:${VUE_APP_API_PORT}/api/`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
