@@ -1,6 +1,6 @@
 import axios from "../../plugins/axios";
 
-export default {
+export const Auth = {
   namespaced: true,
   state: {
     status: false,
@@ -35,11 +35,11 @@ export default {
         commit("authSuccess", { access_token, user });
 
         return res;
-      } catch (err) {
+      } catch (e) {
         commit("authError");
         localStorage.removeItem("token");
 
-        return err;
+        throw e;
       }
     },
     async logout({ commit }) {

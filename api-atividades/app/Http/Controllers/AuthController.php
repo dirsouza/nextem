@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -27,21 +27,10 @@ class AuthController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param AuthRequest $request
      * @return JsonResponse
      */
-    public function register(Request $request): JsonResponse
-    {
-        $response = $this->authService->newUser($request->all());
-
-        return $this->responseAuthToken($response);
-    }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function login(Request $request): JsonResponse
+    public function login(AuthRequest $request): JsonResponse
     {
         $response = $this->authService->loginUser($request->all());
 
@@ -54,16 +43,6 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $response = $this->authService->logoutUser();
-
-        return $this->responseAuthToken($response);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    public function refresh(): JsonResponse
-    {
-        $response = $this->authService->refreshToken();
 
         return $this->responseAuthToken($response);
     }

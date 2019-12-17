@@ -1,97 +1,111 @@
 <template>
   <div>
-    <v-card>
-      <v-card-title>
-        <span class="headline">{{ getTitle }}</span>
-      </v-card-title>
+    <ValidationObserver ref="form" v-slot="{ invalid, passes }">
+      <v-form>
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ getTitle }}</span>
+          </v-card-title>
 
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="12" sm="12" md="12">
-              <v-text-field
-                v-model="activity"
-                label="Atividade"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="12" md="12">
-              <v-select
-                v-model="responsible"
-                :items="listResponsible"
-                attach
-                chips
-                label="Responsável"
-                item-text="name"
-                item-value="id"
-                multiple
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="12" md="6">
-              <v-select
-                v-model="status"
-                :items="listStatus"
-                label="Status"
-                item-text="name"
-                item-value="id"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="12" md="6">
-              <v-menu
-                v-model="datePicker"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on }">
-                  <v-text-field
-                    :value="deadline | dateFormat"
-                    label="Prazo"
-                    readonly
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker locale="pt-br" v-model="deadline" @input="datePicker = false"></v-date-picker>
-              </v-menu>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <ValidationProvider  name="Atividade" rules="required|min:5" v-slot="{ errors }">
+                    <v-text-field
+                      v-model="activity"
+                      label="Atividade"
+                      clearable
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="12" md="12">
+                  <ValidationProvider name="Responsável" rules="required" v-slot="{ errors }">
+                    <v-select
+                      v-model="responsible"
+                      :items="listResponsible"
+                      attach
+                      chips
+                      label="Responsável"
+                      item-text="name"
+                      item-value="id"
+                      multiple
+                      clearable
+                      :error-messages="errors"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="12" md="6">
+                  <ValidationProvider name="Status" rules="required" v-slot="{ errors }">
+                    <v-select
+                      v-model="status"
+                      :items="listStatus"
+                      label="Status"
+                      item-text="name"
+                      item-value="id"
+                      clearable
+                      :error-messages="errors"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="12" md="6">
+                  <ValidationProvider name="Prazo" rules="required" v-slot="{ errors }">
+                    <v-menu
+                      v-model="datePicker"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      lazy
+                      transition="scale-transition"
+                      offset-y
+                      full-width
+                      min-width="290px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          :value="deadline | dateFormat"
+                          label="Prazo"
+                          readonly
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker locale="pt-br" v-model="deadline" @input="datePicker = false"></v-date-picker>
+                    </v-menu>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
 
-      <v-card-actions>
-        <v-spacer/>
-        <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
-        <v-btn color="blue darken-1" text @click="save">Salvar</v-btn>
-      </v-card-actions>
-    </v-card>
-    <Snackbar
-      :snackbar="snackbar.show"
-      :message="snackbar.message"
-      :type="snackbar.type"
-    />
+          <v-card-actions>
+            <v-spacer/>
+            <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
+            <v-btn color="blue darken-1" text @click="passes(save)" :disabled="invalid">Salvar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </ValidationObserver>
+    <Snackbar/>
   </div>
 </template>
 
 <script>
 import moment from "moment";
 import Snackbar from "./Snackbar";
+import { ValidationObserver, ValidationProvider } from "vee-validate";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "Form",
   components: {
-    Snackbar
+    Snackbar,
+    ValidationObserver,
+    ValidationProvider
   },
   props: {
     title: {
       type: String,
       required: true
-    },
-    itemEdit: {
-      type: Object,
-      required: false
     }
   },
   data() {
@@ -102,31 +116,29 @@ export default {
       deadline: new Date().toISOString().substr(0, 10),
       listResponsible: [],
       listStatus: [],
-      datePicker: false,
-      snackbar: {
-        show: false,
-        message: "",
-        type: ""
-      }
+      datePicker: false
     };
   },
   created() {
     this.getResponsible();
     this.getStatus();
   },
-  watch: {
-    itemEdit(item) {
-      if (item) {
-        this.activity = item.activity;
-        this.responsible = Object.assign([], item.users.map(u => u.id));
-        this.status = item.status.id;
-        this.deadline = item.deadline;
-      }
-    }
-  },
   computed: {
+    ...mapGetters("activities", {
+      getActivity: "getActivity"
+    }),
     getTitle() {
       return this.title;
+    }
+  },
+  watch: {
+    getActivity(activity) {
+      if (activity !== null) {
+        this.activity = activity.activity;
+        this.responsible = Object.assign([], activity.users.map(u => u.id));
+        this.status = activity.status.id;
+        this.deadline = activity.deadline;
+      }
     }
   },
   filters: {
@@ -135,23 +147,22 @@ export default {
     }
   },
   methods: {
+    ...mapActions("snackbar", {
+      showSnackbar: "showSnackbar"
+    }),
+    ...mapMutations("activities", {
+      clearActivity: "clearActivity"
+    }),
     async getResponsible() {
       try {
         this.listResponsible = await this.$axios.post("activity/responsible")
           .then(res => res.data.data);
       } catch (e) {
-        const res = e.response;
-
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
-        }
+        this.showSnackbar({
+          show: true,
+          message: "Não foi possível carregar a lista de Responsáveis!",
+          type: "error"
+        });
       }
     },
     async getStatus() {
@@ -159,29 +170,18 @@ export default {
         this.listStatus = await this.$axios.post("activity/status")
           .then(res => res.data.data);
       } catch (e) {
-        const res = e.response;
-
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
-        }
+        this.showSnackbar({
+          show: true,
+          message: "Não foi possível carregar a lista de Status!",
+          type: "error"
+        });
       }
     },
-    close() {
-      this.clearForm();
-      this.$emit("dialog:close", false);
-    },
     async save() {
-      if (this.itemEdit === null || Object.keys(this.itemEdit).length <= 0) {
+      if (this.getActivity === null) {
         await this.create();
       } else {
-        await this.update(this.itemEdit.id);
+        await this.update(this.getActivity.id);
       }
     },
     async create() {
@@ -194,19 +194,18 @@ export default {
         });
 
         this.close();
+
+        this.showSnackbar({
+          show: true,
+          message: "Tarefa criada com sucesso!",
+          type: "success"
+        });
       } catch (e) {
-        const res = e.response;
-
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
-        }
+        this.showSnackbar({
+          show: true,
+          message: "Não foi possível criar a tarefa!",
+          type: "error"
+        });
       }
     },
     async update(id) {
@@ -219,20 +218,25 @@ export default {
         });
 
         this.close();
+
+        this.showSnackbar({
+          show: true,
+          message: "Tarefa atualizada com sucesso!",
+          type: "success"
+        });
       } catch (e) {
-        const res = e.response;
-
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
-        }
+        this.showSnackbar({
+          show: true,
+          message: "Não foi possível atualizar a tarefa!",
+          type: "error"
+        });
       }
+    },
+    close() {
+      this.$refs.form.reset();
+      this.clearActivity();
+      this.clearForm();
+      this.$emit("dialog:close", false);
     },
     clearForm() {
       this.activity = null;

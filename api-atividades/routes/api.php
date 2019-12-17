@@ -6,7 +6,6 @@ Route::middleware('api')->group(function () {
     Route::middleware('tokenValidate')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::post('logout', 'AuthController@logout');
-            Route::post('refresh', 'AuthController@refresh');
         });
 
         Route::prefix('activity')->group(function () {

@@ -10,7 +10,7 @@
         <v-toolbar flat color="white">
           <v-toolbar-title>Lista de Tarafas</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer/>
+          <v-spacer />
           <v-btn color="primary" dark class="mb-2" @click="dialog = true">Nova Tarefa</v-btn>
         </v-toolbar>
       </template>
@@ -35,15 +35,10 @@
 
     <Dialog
       :dialog="dialog"
-      :item-edit="itemEdit"
       @dialog:close="close()"
     />
 
-    <Snackbar
-      :snackbar="snackbar.show"
-      :message="snackbar.message"
-      :type="snackbar.type"
-    />
+    <Snackbar />
   </div>
 </template>
 
@@ -51,6 +46,7 @@
 import moment from "moment";
 import Dialog from "./Dialog";
 import Snackbar from "./Snackbar";
+import { mapActions, mapMutations } from "vuex";
 
 export default {
   name: "Activities",
@@ -68,13 +64,7 @@ export default {
         { text: "Prazo", value: "deadline", align: "center" },
         { text: "Ações", value: "action", align: "center", sortable: false, filterable: false }
       ],
-      listActivities: [],
-      itemEdit: {},
-      snackbar: {
-        show: false,
-        message: "",
-        type: ""
-      }
+      listActivities: []
     };
   },
   created() {
@@ -84,59 +74,70 @@ export default {
     userFormat(users) {
       const listNameUser = Object.assign([], users.map(u => u.name));
 
-      return listNameUser.join(', ');
+      return listNameUser.join(", ");
     },
     dateFormat(date) {
       return moment(date, "YYYY-MM-DD").format("DD/MM/YYYY");
     }
   },
   methods: {
+    ...mapActions("snackbar", {
+      showSnackbar: "showSnackbar"
+    }),
+    ...mapMutations("activities", {
+      setActivity: "setActivity",
+      clearActivity: "clearActivity"
+    }),
     async getActivities() {
       try {
-        this.listActivities = [];
         this.listActivities = await this.$axios.post("activity/activities")
           .then(res => res.data.data);
       } catch (e) {
-        const res = e.response;
-
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
-        }
+        this.showSnackbar({
+          show: true,
+          message: "Não foi possível carregar a lista de tarefas!",
+          type: "error"
+        });
       }
     },
     editItem(activity) {
-      this.itemEdit = activity;
+      this.setActivity(activity);
       this.dialog = true;
     },
-    async deleteItem(id) {
-      try {
-        await this.$axios.post(`activity/${id}/delete`);
-        this.getActivities();
-      } catch (e) {
-        const res = e.response;
+    deleteItem(id) {
+      this.$swal.fire({
+        title: "Excluir Tarefa",
+        text: "Confirme para excluir!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Confirmar",
+        cancelButtonAriaLabel: "Cancelar"
+      })
+      .then(result => {
+        if (result.value) {
+          this.$axios.post(`activity/${id}/delete`)
+            .then(() => {
+              this.getActivities();
 
-        if (res.status === 401 && res.data.message === "Token expirado!") {
-          this.snackbar = {
-            show: true,
-            message: res.data.message || "Não autorizado",
-            type: 'error'
-          };
-
-          this.$store.dispatch("auth/logout");
-          this.$router.push("/login");
+              this.showSnackbar({
+                show: true,
+                message: "Tarefa excluída com sucesso!",
+                type: "success"
+              });
+            })
+            .catch(() => {
+              this.showSnackbar({
+                show: true,
+                message: "Não foi possível excluir a tarefa!",
+                type: "error"
+              });
+            });
         }
-      }
+      });
     },
     close(event) {
       this.getActivities();
-      this.itemEdit = null;
+      this.clearActivity();
       this.dialog = event;
     }
   }

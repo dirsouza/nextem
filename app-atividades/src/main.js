@@ -4,6 +4,8 @@ import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 import Axios from "./plugins/axios";
+import("./plugins/vee-validate");
+import("./plugins/sweetalert");
 
 Vue.prototype.$axios = Axios;
 

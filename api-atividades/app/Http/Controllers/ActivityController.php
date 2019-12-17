@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ActivityRequest;
 use App\Services\ActivityService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class ActivityController extends Controller
 {
@@ -23,57 +22,67 @@ class ActivityController extends Controller
         $this->activityService = $activityService;
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function activities(): JsonResponse
     {
         $response = $this->activityService->getActivities();
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function responsible(): JsonResponse
     {
         $response = $this->activityService->getResponsible();
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function status(): JsonResponse
     {
         $response = $this->activityService->getStatus();
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 
-    public function create(Request $request): JsonResponse
+    /**
+     * @param ActivityRequest $request
+     * @return JsonResponse
+     */
+    public function create(ActivityRequest $request): JsonResponse
     {
         $response = $this->activityService->createActivity($request->all());
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 
-    public function update(int $id, Request $request)
+    /**
+     * @param int $id
+     * @param ActivityRequest $request
+     * @return JsonResponse
+     */
+    public function update(int $id, ActivityRequest $request)
     {
         $response = $this->activityService->updateActivity($id, $request->all());
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
     public function delete(int $id)
     {
         $response = $this->activityService->deleteActivity($id);
 
-        return response()
-            ->json(Arr::except($response, 'code'))
-            ->setStatusCode($response['code']);
+        return $this->response($response);
     }
 }

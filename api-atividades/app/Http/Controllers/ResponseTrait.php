@@ -26,6 +26,17 @@ trait ResponseTrait
                 ->header('Authorization', $token);
         }
 
+        return $this->response($response);
+    }
+
+    /**
+     * Retorna os dados em response normal
+     *
+     * @param array $response
+     * @return JsonResponse
+     */
+    protected function response(array $response): JsonResponse
+    {
         return response()
             ->json(Arr::except($response, 'code'))
             ->setStatusCode($response['code']);

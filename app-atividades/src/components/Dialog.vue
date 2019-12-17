@@ -6,7 +6,6 @@
   >
     <Form
       :title="title"
-      :item-edit="itemEdit"
       @dialog:close="close"
     />
   </v-dialog>
@@ -14,6 +13,7 @@
 
 <script>
 import Form from "./Form";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Dialog",
@@ -24,10 +24,6 @@ export default {
     dialog: {
       type: Boolean,
       default: false
-    },
-    itemEdit: {
-      type: Object,
-      required: false
     }
   },
   data() {
@@ -36,12 +32,17 @@ export default {
       title: "Nova Tarefa"
     };
   },
+  computed: {
+    ...mapGetters("activities", {
+      getActivity: "getActivity"
+    })
+  },
   watch: {
     dialog(val) {
       this.showDialog = val;
     },
-    itemEdit(item) {
-      if (item) {
+    getActivity(activity) {
+      if (activity !== null) {
         this.title = "Editar Tarefa";
       } else {
         this.title = "Nova Tarefa";

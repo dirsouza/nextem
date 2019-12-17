@@ -7,18 +7,20 @@ namespace App\Services;
 use App\Models\Activity;
 use App\Models\Status;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 class ActivityService
 {
+    /**
+     * Retorna a lista de Tarefas
+     *
+     * @return array
+     */
     public function getActivities(): array
     {
         try {
             $activities = Activity::with(['users', 'status'])->get();
-
-            if ($activities->isEmpty()) {
-                throw new \Exception("Não foram encontradas Tarefas.", 404);
-            }
 
             return [
                 'success' => true,
@@ -34,14 +36,15 @@ class ActivityService
         }
     }
 
+    /**
+     * Retorna a lista de Usuários
+     *
+     * @return array
+     */
     public function getResponsible(): array
     {
         try {
             $responsible = User::all();
-
-            if ($responsible->isEmpty()) {
-                throw new \Exception("Não foram encontrados Responsáveis.", 404);
-            }
 
             return [
                 'success' => true,
@@ -57,14 +60,15 @@ class ActivityService
         }
     }
 
+    /**
+     * Retorna a lista de Status
+     *
+     * @return array
+     */
     public function getStatus(): array
     {
         try {
             $status = Status::all();
-
-            if ($status->isEmpty()) {
-                throw new \Exception("Não foram encontrados Status.", 404);
-            }
 
             return [
                 'success' => true,
@@ -80,15 +84,21 @@ class ActivityService
         }
     }
 
+    /**
+     * Cria uma nova tarefa
+     *
+     * @param array $data
+     * @return array
+     */
     public function createActivity(array $data): array
     {
         DB::beginTransaction();
         try {
             $activity = Activity::create([
-                    "activity" => $data["activity"],
-                    "status_id" => $data["status"],
-                    "deadline" => $data["deadline"]
-                ]);
+                "activity" => $data["activity"],
+                "status_id" => $data["status"],
+                "deadline" => $data["deadline"]
+            ]);
 
             if (!$activity->exists()) {
                 throw new \Exception("Não foi possível realizar o cadastro da tarefa.", 500);
@@ -103,6 +113,14 @@ class ActivityService
                 'message' => "Tarefa criada com sucesso!",
                 'code' => 201
             ];
+        } catch (QueryException $e) {
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => "Não foi possível realizar o cadastro da tarefa 'SQLSTATE[{$e->getCode()}]'",
+                'code' => 500
+            ];
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -114,6 +132,13 @@ class ActivityService
         }
     }
 
+    /**
+     * Atualiza um tarefa
+     *
+     * @param int $id
+     * @param array $data
+     * @return array
+     */
     public static function updateActivity(int $id, array $data): array
     {
         DB::beginTransaction();
@@ -141,7 +166,7 @@ class ActivityService
             return [
                 'success' => true,
                 'message' => "Tarefa atualizada com sucesso!",
-                'code' => 201
+                'code' => 200
             ];
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -154,6 +179,12 @@ class ActivityService
         }
     }
 
+    /**
+     * Deleta uma tarefa
+     *
+     * @param int $id
+     * @return array
+     */
     public static function deleteActivity(int $id): array
     {
         DB::beginTransaction();
@@ -177,7 +208,7 @@ class ActivityService
             return [
                 'success' => true,
                 'message' => "Tarefa excluída com sucesso!",
-                'code' => 201
+                'code' => 200
             ];
         } catch (\Throwable $e) {
             DB::rollBack();

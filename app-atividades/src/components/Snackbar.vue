@@ -1,45 +1,43 @@
 <template>
   <v-snackbar
-    v-model="showSnackbar"
-    :color="showType"
+    v-model="snackbar.show"
+    :color="snackbar.type"
     :timeout="5000"
+    @input="clear"
     multi-line
     top
     right
   >
-    {{ showMessage }}
+    {{ snackbar.message }}
+
+    <v-btn
+      text
+      @click="snackbar.show = false"
+    >
+      Fechar
+    </v-btn>
   </v-snackbar>
 </template>
 
 <script>
+import { mapMutations, mapGetters, mapActions } from "vuex";
+
 export default {
   name: "Snackbar",
-  props: {
-    snackbar: {
-      type: Boolean,
-      default: false
-    },
-    message: {
-      type: String,
-      required: true
-    },
-    type: {
-      type: String,
-      required: true
-    }
-  },
   computed: {
-    showSnackbar: {
-      get() {
-        return this.snackbar;
-      },
-      set() {}
-    },
-    showMessage() {
-      return this.message;
-    },
-    showType() {
-      return this.type;
+    ...mapGetters("snackbar", {
+      snackbar: "getSnackbar"
+    })
+  },
+  methods: {
+    ...mapActions("snackbar", {
+      showSnackbar: "showSnackbar"
+    }),
+    ...mapMutations("snackbar", {
+      clearSnackbar: "clearSnackbar"
+    }),
+    clear() {
+      this.clearSnackbar();
     }
   }
 };

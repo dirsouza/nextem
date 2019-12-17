@@ -1,15 +1,15 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
-import auth from "./modules/auth";
-import activities from "./modules/activities";
+import { Auth, Activities, Snackbar } from "./modules";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
-    auth,
-    activities
+    auth: Auth,
+    activities: Activities,
+    snackbar: Snackbar
   },
   plugins: [createPersistedState()]
 });

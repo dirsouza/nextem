@@ -7457,6 +7457,11 @@ svgo@^1.0.0:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
+sweetalert2@^9.5.3:
+  version "9.5.3"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-9.5.3.tgz#b280e218dc387a96fa2b6175b50d75421a708f7d"
+  integrity sha512-4wzLUCmVby3NPQC8XHp0HRJgTm5tbAO7OOaqabATNe0U6JN/oyBTS7iJJG9V83MpcP6MLDUEWcGO/Y8i6g2jYw==
+
 table@^5.2.3:
   version "5.4.6"
   resolved "https://registry.yarnpkg.com/table/-/table-5.4.6.tgz#1292d19500ce3f86053b05f0e8e7e4a3bb21079e"
@@ -7897,6 +7902,11 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+
+vee-validate@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-3.2.0.tgz#0e8b2a4307339b05df01db4d2c91ab6ed8a3b90d"
+  integrity sha512-gyC4rRl+NkG9spF9kQW85JPSCUpdd0ik5VqrfgZ4IXLCtY3xJY0xP6A+b4FUfLJZ+nAG+dClKTCsm/AeJTtVcQ==
 
 vendors@^1.0.0:
   version "1.0.3"
