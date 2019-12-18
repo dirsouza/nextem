@@ -141,7 +141,7 @@ class ActivityService
      * @param array $data
      * @return array
      */
-    public static function updateActivity(int $id, array $data): array
+    public function updateActivity(int $id, array $data): array
     {
         DB::beginTransaction();
         try {
@@ -187,7 +187,7 @@ class ActivityService
      * @param int $id
      * @return array
      */
-    public static function deleteActivity(int $id): array
+    public function deleteActivity(int $id): array
     {
         DB::beginTransaction();
         try {
