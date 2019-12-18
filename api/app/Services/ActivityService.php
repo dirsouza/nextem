@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\DB;
 class ActivityService
 {
     /**
+     * @var array
+     */
+    private $statusCode;
+
+    public function __construct()
+    {
+        $this->statusCode = config("statuscode");
+    }
+    
+    /**
      * Retorna a lista de Tarefas
      *
      * @return array
@@ -31,7 +41,7 @@ class ActivityService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -55,7 +65,7 @@ class ActivityService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -79,7 +89,7 @@ class ActivityService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -113,21 +123,13 @@ class ActivityService
                 'message' => "Tarefa criada com sucesso!",
                 'code' => 201
             ];
-        } catch (QueryException $e) {
-            DB::rollBack();
-
-            return [
-                'success' => false,
-                'message' => "Não foi possível realizar o cadastro da tarefa 'SQLSTATE[{$e->getCode()}]'",
-                'code' => 500
-            ];
         } catch (\Throwable $e) {
             DB::rollBack();
 
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -174,7 +176,7 @@ class ActivityService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -216,8 +218,19 @@ class ActivityService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
+    }
+
+    /**
+     * Valida de status code existe no array
+     *
+     * @param integer $code
+     * @return boolean
+     */
+    private function valideStatusCode(int $code): bool
+    {
+        return array_key_exists($code, $this->statusCode);
     }
 }

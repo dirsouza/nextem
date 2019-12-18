@@ -12,7 +12,7 @@
       <v-container class="fill">
         <v-row align="center" justify="center">
           <v-col class="text-center">
-            <activities />
+            <Activities />
           </v-col>
         </v-row>
       </v-container>

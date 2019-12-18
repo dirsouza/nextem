@@ -7,6 +7,16 @@ namespace App\Services;
 class AuthService
 {
     /**
+     * @var array
+     */
+    private $statusCode;
+
+    public function __construct()
+    {
+        $this->statusCode = config("statuscode");
+    }
+
+    /**
      * Autentica o usuário
      *
      * @param array $data
@@ -33,7 +43,7 @@ class AuthService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500,
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -57,7 +67,7 @@ class AuthService
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode() > 0 ? $e->getCode() : 500,
+                'code' => $this->valideStatusCode($e->getCode()) ? $e->getCode() : 500,
             ];
         }
     }
@@ -76,5 +86,16 @@ class AuthService
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => auth()->user()
         ];
+    }
+
+    /**
+     * Valida de status code existe no array
+     *
+     * @param integer $code
+     * @return boolean
+     */
+    private function valideStatusCode(int $code): bool
+    {
+        return array_key_exists($code, $this->statusCode);
     }
 }
