@@ -25,6 +25,26 @@ docker-compose up
 docker-compose up -d
 ```
 
+## Links
+
+```bash
+# Link da API
+http://0.0.0.0:8000
+
+# Link do APP
+http://0.0.0.0:8080
+```
+
+## Acesso
+
+```bash
+# Usuário
+test@nextem.com.br
+
+# Senha
+1234
+```
+
 ## Configuração do .env
 
 ```bash
